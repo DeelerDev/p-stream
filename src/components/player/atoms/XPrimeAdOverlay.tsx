@@ -29,7 +29,7 @@ export function XPrimeAdOverlay() {
     if (!shouldShow && show) {
       setShow(false);
     }
-  }, [sourceId, status, disableXPrimeAds, show]);
+  }, [sourceId, status, disableXPrimeAds]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!show) {
     return null;
