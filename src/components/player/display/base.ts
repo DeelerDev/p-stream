@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import fscreen from "fscreen";
 import Hls, { Level } from "hls.js";
 
@@ -104,6 +105,27 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
     string,
     (value: void | PromiseLike<void>) => void
   >();
+
+  function injectXPrimeAd(sourceId?: string | null) {
+    const currentSourceId = sourceId ?? usePlayerStore.getState().sourceId;
+    console.log("currentSourceId", currentSourceId);
+    const disableXPrimeAds = usePreferencesStore.getState().disableXPrimeAds;
+    if (
+      currentSourceId === "xprimetv" &&
+      !disableXPrimeAds &&
+      !document.querySelector(
+        'script[data-cfasync="false"][src*="jg.prisagedibbuk.com"]',
+      )
+    ) {
+      console.log("injecting XPrime ad");
+      const script = document.createElement("script");
+      script.setAttribute("data-cfasync", "false");
+      script.async = true;
+      script.type = "text/javascript";
+      script.src = "//jg.prisagedibbuk.com/r47OViiCQMeGnyQ/131974";
+      document.head.appendChild(script);
+    }
+  }
 
   function reportLevels() {
     if (!hls) return;
@@ -356,6 +378,7 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
     videoElement.addEventListener("play", () => {
       emit("play", undefined);
       emit("loading", false);
+      injectXPrimeAd();
     });
     videoElement.addEventListener("error", () => {
       const err = videoElement?.error ?? null;
@@ -382,24 +405,6 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
             emit("pause", undefined);
           });
         }
-      }
-
-      // Inject popup ad for xprime sources
-      const sourceId = usePlayerStore.getState().sourceId;
-      const disableXPrimeAds = usePreferencesStore.getState().disableXPrimeAds;
-      if (
-        sourceId === "xprime" &&
-        !disableXPrimeAds &&
-        !document.querySelector(
-          'script[data-cfasync="false"][src*="jg.prisagedibbuk.com"]',
-        )
-      ) {
-        const script = document.createElement("script");
-        script.setAttribute("data-cfasync", "false");
-        script.async = true;
-        script.type = "text/javascript";
-        script.src = "//jg.prisagedibbuk.com/r47OViiCQMeGnyQ/131974";
-        document.head.appendChild(script);
       }
     });
     videoElement.addEventListener("waiting", () => emit("loading", true));
@@ -578,6 +583,10 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
       // Set autoplay flag if starting from beginning (indicates autoplay transition)
       shouldAutoplayAfterLoad = ops.startAt === 0;
       setSource();
+      // Inject ads after source change if conditions are met
+      if (ops.source) {
+        injectXPrimeAd();
+      }
     },
     changeQuality(newAutomaticQuality, newPreferredQuality) {
       if (source?.type !== "hls") return;
