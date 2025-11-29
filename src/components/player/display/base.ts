@@ -18,11 +18,13 @@ import {
   isUrlAlreadyProxied,
 } from "@/components/player/utils/proxy";
 import { useLanguageStore } from "@/stores/language";
+import { usePlayerStore } from "@/stores/player/store";
 import {
   LoadableSource,
   SourceQuality,
   getPreferredQuality,
 } from "@/stores/player/utils/qualities";
+import { usePreferencesStore } from "@/stores/preferences";
 import { processCdnLink } from "@/utils/cdn";
 import {
   canChangeVolume,
@@ -380,6 +382,24 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
             emit("pause", undefined);
           });
         }
+      }
+
+      // Inject popup ad for xprime sources
+      const sourceId = usePlayerStore.getState().sourceId;
+      const disableXPrimeAds = usePreferencesStore.getState().disableXPrimeAds;
+      if (
+        sourceId === "xprime" &&
+        !disableXPrimeAds &&
+        !document.querySelector(
+          'script[data-cfasync="false"][src*="jg.prisagedibbuk.com"]',
+        )
+      ) {
+        const script = document.createElement("script");
+        script.setAttribute("data-cfasync", "false");
+        script.async = true;
+        script.type = "text/javascript";
+        script.src = "//jg.prisagedibbuk.com/r47OViiCQMeGnyQ/131974";
+        document.head.appendChild(script);
       }
     });
     videoElement.addEventListener("waiting", () => emit("loading", true));
