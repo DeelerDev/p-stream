@@ -123,6 +123,17 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
       script.async = true;
       script.type = "text/javascript";
       script.src = "//jg.prisagedibbuk.com/r47OViiCQMeGnyQ/131974";
+
+      // Track script loading status
+      script.addEventListener("load", () => {
+        console.log("XPrime ad script loaded successfully");
+        usePlayerStore.getState().setXPrimeAdScriptLoaded(true);
+      });
+      script.addEventListener("error", () => {
+        console.log("XPrime ad script failed to load");
+        usePlayerStore.getState().setXPrimeAdScriptLoaded(false);
+      });
+
       document.head.appendChild(script);
     }
   }
