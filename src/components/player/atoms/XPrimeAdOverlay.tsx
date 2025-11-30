@@ -16,8 +16,14 @@ export function XPrimeAdOverlay() {
 
   useEffect(() => {
     // Only show overlay when all conditions are met
+    const scriptExists = !!document.querySelector(
+      'script[data-cfasync="false"][src*="jg.prisagedibbuk.com"]',
+    );
     const shouldShow =
-      sourceId === "xprimetv" && status === "playing" && !disableXPrimeAds;
+      sourceId === "xprimetv" &&
+      status === "playing" &&
+      !disableXPrimeAds &&
+      scriptExists;
     if (shouldShow && !show) {
       setShow(true);
       const timer = setTimeout(() => {
