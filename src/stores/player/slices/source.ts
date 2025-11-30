@@ -84,7 +84,6 @@ export interface SourceSlice {
   currentAudioTrack: AudioTrack | null;
   captionList: CaptionListItem[];
   isLoadingExternalSubtitles: boolean;
-  xprimeAdScriptLoaded: boolean;
   caption: {
     selected: Caption | null;
     asTrack: boolean;
@@ -104,7 +103,6 @@ export interface SourceSlice {
   enableAutomaticQuality(): void;
   redisplaySource(startAt: number): void;
   setCaptionAsTrack(asTrack: boolean): void;
-  setXPrimeAdScriptLoaded(loaded: boolean): void;
   addExternalSubtitles(): Promise<void>;
 }
 
@@ -139,7 +137,6 @@ export const createSourceSlice: MakeSlice<SourceSlice> = (set, get) => ({
   audioTracks: [],
   captionList: [],
   isLoadingExternalSubtitles: false,
-  xprimeAdScriptLoaded: false,
   currentQuality: null,
   currentAudioTrack: null,
   status: playerStatus.IDLE,
@@ -257,11 +254,6 @@ export const createSourceSlice: MakeSlice<SourceSlice> = (set, get) => ({
   setCaptionAsTrack(asTrack: boolean) {
     set((s) => {
       s.caption.asTrack = asTrack;
-    });
-  },
-  setXPrimeAdScriptLoaded(loaded: boolean) {
-    set((s) => {
-      s.xprimeAdScriptLoaded = loaded;
     });
   },
   async addExternalSubtitles() {

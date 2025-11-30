@@ -7,10 +7,9 @@ import { usePlayerStore } from "@/stores/player/store";
 import { usePreferencesStore } from "@/stores/preferences";
 
 export function XPrimeAdOverlay() {
-  const { sourceId, status, xprimeAdScriptLoaded } = usePlayerStore((s) => ({
+  const { sourceId, status } = usePlayerStore((s) => ({
     sourceId: s.sourceId,
     status: s.status,
-    xprimeAdScriptLoaded: s.xprimeAdScriptLoaded,
   }));
   const disableXPrimeAds = usePreferencesStore((s) => s.disableXPrimeAds);
   const [show, setShow] = useState(false);
@@ -18,10 +17,7 @@ export function XPrimeAdOverlay() {
   useEffect(() => {
     // Only show overlay when all conditions are met
     const shouldShow =
-      sourceId === "xprimetv" &&
-      status === "playing" &&
-      !disableXPrimeAds &&
-      xprimeAdScriptLoaded;
+      sourceId === "xprimetv" && status === "playing" && !disableXPrimeAds;
     if (shouldShow && !show) {
       setShow(true);
       const timer = setTimeout(() => {
