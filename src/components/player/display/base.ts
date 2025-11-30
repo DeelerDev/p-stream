@@ -106,12 +106,29 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
     (value: void | PromiseLike<void>) => void
   >();
 
+  function removeXPrimeAd() {
+    const script = document.querySelector(
+      'script[data-cfasync="false"][src*="jg.prisagedibbuk.com"]',
+    );
+    if (script) {
+      console.log("removing XPrime ad script");
+      script.remove();
+    }
+  }
+
   function injectXPrimeAd(sourceId?: string | null) {
     const currentSourceId = sourceId ?? usePlayerStore.getState().sourceId;
     console.log("currentSourceId", currentSourceId);
     const disableXPrimeAds = usePreferencesStore.getState().disableXPrimeAds;
+
+    // Remove script if not playing XPrime content
+    if (currentSourceId !== "xprimetv") {
+      removeXPrimeAd();
+      return;
+    }
+
+    // Inject script if playing XPrime content and ads are enabled
     if (
-      currentSourceId === "xprimetv" &&
       !disableXPrimeAds &&
       !document.querySelector(
         'script[data-cfasync="false"][src*="jg.prisagedibbuk.com"]',
@@ -572,6 +589,8 @@ export function makeVideoElementDisplayInterface(): DisplayInterface {
         "leavepictureinpicture",
         pictureInPictureChange,
       );
+      // Clean up XPrime ad script when destroying the display
+      removeXPrimeAd();
     },
     load(ops) {
       if (!ops.source) unloadSource();
